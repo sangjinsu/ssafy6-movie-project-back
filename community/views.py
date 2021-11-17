@@ -3,6 +3,11 @@ from django.shortcuts import render
 # Create your views here.
 
 
+def review_detail(request, review_pk):
+    # 단일 리뷰 상세 정보 조회
+    pass
+
+
 def create_review(request, movie_pk):
     # 리뷰 생성
     pass

@@ -19,10 +19,10 @@ urlpatterns = [
     path("<int:movie_pk>/", views.detail),
 
     # 좋아요 기능
-    path("<int:movie_pk>/like", views.like),
+    path("<int:movie_pk>/like/", views.like),
 
     # 찜 기능
-    path("<int:movie_pk>/pick", views.pick),
+    path("<int:movie_pk>/pick/", views.pick),
 
     # 사용자 영화 추천
     path("recommend/", views.recommend)
