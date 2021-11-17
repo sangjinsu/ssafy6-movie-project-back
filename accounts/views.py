@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
+from accounts.common.validator import password_validator, username_validator
+
 
 from .serializers import UserSerializer
 
@@ -11,8 +13,17 @@ from .serializers import UserSerializer
 @permission_classes([AllowAny])
 def signup(request):
     # 1-1. Client에서 온 데이터를 받아서
+    username = request.data.get('username')
     password = request.data.get('password')
     password_confirmation = request.data.get('passwordConfirmation')
+
+    errors = dict()
+    errors['username'] = username_validator(username)
+    errors['password'] = password_validator(password)
+    errors['passwordConfirmation'] = password_validator(password_confirmation)
+
+    if len(errors['username']) or len(errors['password']) or len(errors['passwordConfirmation']):
+        return Response({'error': errors}, status=status.HTTP_400_BAD_REQUEST)
 
     # 1-2. 패스워드 일치 여부 체크
     if password != password_confirmation:
