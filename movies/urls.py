@@ -6,6 +6,8 @@ urlpatterns = [
     # 최신 영화 리스트
     path("", views.movies_lastest),
 
+    path("top/", views.movies_top),
+
     # 좋아요 영화 리스트
     path("like/", views.movies_like),
 
