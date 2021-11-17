@@ -31,6 +31,12 @@ def signup(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@api_view(['DELETE'])
+def delete(request):
+    request.user.delete()
+    return Response("delete ok", status=status.HTTP_204_NO_CONTENT)
+
+
 def profile(reqeust, username):
     pass
 
