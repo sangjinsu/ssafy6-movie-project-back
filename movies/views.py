@@ -12,14 +12,10 @@ from .models import Genre, Movie
 
 @api_view(['GET'])
 def movies_top(request):
-    movie = Movie.objects.order_by(
-        '-popularity',  '-vote_count', '-vote_average',  '-release_date').first()
-    movie_genres = movie.genres.all()
-    new_genres = []
-    for mg in movie_genres:
-        new_genres.append(mg.name)
-    serializer = MovieSerializer(movie)
-    return Response({'data': serializer.data, 'genres': new_genres}, status=status.HTTP_200_OK)
+    movies = Movie.objects.order_by(
+        '-popularity',  '-vote_count', '-vote_average',  '-release_date')[:3]
+    serializer = MovieSerializer(movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -29,6 +25,7 @@ def movies_lastest(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
 def movies_like(request):
     user = request.user
     movies = user.like_movies.all()
@@ -36,6 +33,7 @@ def movies_like(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
 def movies_pick(request):
     user = request.user
     movies = user.pick_movies.all()
