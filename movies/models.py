@@ -7,6 +7,9 @@ from django.contrib.auth import get_user_model
 class Genre(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class Movie(models.Model):
     title = models.CharField(max_length=100)
@@ -22,3 +25,6 @@ class Movie(models.Model):
         get_user_model(), related_name='like_movies')
     pick_users = models.ManyToManyField(
         get_user_model(), related_name='pick_movies')
+
+    def __str__(self):
+        return self.title

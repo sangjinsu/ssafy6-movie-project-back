@@ -50,7 +50,3 @@ def delete(request):
 
 def profile(reqeust, username):
     pass
-
-
-def follow(request, user_pk):
-    pass
