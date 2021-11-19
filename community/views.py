@@ -33,7 +33,8 @@ def review(request, review_pk):
 def create_list_review(request, movie_pk):
     if request.method == 'GET':
         movie = get_object_or_404(Movie, pk=movie_pk)
-        serializer = ReviewListSerializer(movie.reviews, many=True)
+        reviews = movie.reviews.order_by('-created_at')
+        serializer = ReviewListSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
@@ -50,6 +51,7 @@ def create_list_comment(request, review_pk):
     if request.method == 'GET':
         # 리스트
         review = get_object_or_404(Review, pk=review_pk)
+        comments = review.comments.order_by('-created_at')
         serializer = CommentListSerializer(review.comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'POST':
