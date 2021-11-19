@@ -1,12 +1,17 @@
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from requests.api import get
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.serializers import Serializer
 
 from accounts.common.validator import password_validator, username_validator
 
 
-from .serializers import UserSerializer
+from .serializers import UserDetailSerializer, UserSerializer
+from .models import User
 
 
 @api_view(['POST'])
@@ -45,8 +50,11 @@ def signup(request):
 @api_view(['DELETE'])
 def delete(request):
     request.user.delete()
-    return Response("delete ok", status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def profile(reqeust, username):
-    pass
+@api_view(['GET'])
+def profile(request, username):
+    user = get_object_or_404(get_user_model(), username=username)
+    serializer = UserDetailSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
