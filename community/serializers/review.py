@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from movies.models import Movie
-from .models import Review
+from community.models import Review
 
 
 class DetailReviewSerializer(serializers.ModelSerializer):

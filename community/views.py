@@ -2,9 +2,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from community.models import Review
-
-from community.serializers import DetailReviewSerializer, ReviewSerializer, ReviewListSerializer
+from community.models import Comment, Review
+from community.serializers.comment import CommentSerializer, CommentListSerializer
+from community.serializers.review import DetailReviewSerializer, ReviewListSerializer, ReviewSerializer
 from movies.models import Movie
 
 # Create your views here.
@@ -45,11 +45,32 @@ def create_list_review(request, movie_pk):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def create_comment(request, review_pk):
-    # 댓글 생성
-    pass
+@api_view(['GET', 'POST'])
+def create_list_comment(request, review_pk):
+    if request.method == 'GET':
+        # 리스트
+        review = get_object_or_404(Review, pk=review_pk)
+        serializer = CommentListSerializer(review.comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    elif request.method == 'POST':
+        # 댓글 생성
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            review = get_object_or_404(Review, pk=review_pk)
+            serializer.save(user=request.user, review=review)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def comment(request, review_pk):
+@api_view(['PUT', 'DELETE'])
+def comment(request, comment_pk):
     # 댓글 수정 삭제
-    pass
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    if request.method == 'PUT':
+        serializer = CommentSerializer(instance=comment, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    elif request.method == 'DELETE':
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
