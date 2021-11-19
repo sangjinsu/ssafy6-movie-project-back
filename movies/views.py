@@ -14,14 +14,14 @@ import requests
 
 @api_view(['GET'])
 def movies_top(request):
-    movies = Movie.objects.order_by('-popularity', '-release_date')[:3]
+    movies = Movie.objects.order_by('-popularity', '-release_date')[:100]
     serializer = MovieSerializer(movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def movies_lastest(request):
-    movies = Movie.objects.order_by('-release_date')[:20]
+    movies = Movie.objects.order_by('-release_date')[:100]
     serializer = MovieSerializer(movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -68,7 +68,7 @@ def movies_pick(request):
 @api_view(['GET'])
 def movies_genre(request, genre_pk):
     genre = get_object_or_404(Genre, pk=genre_pk)
-    movies = genre.movies.order_by('-popularity', '-release_date')[:20]
+    movies = genre.movies.order_by('-popularity', '-release_date')[:100]
     serializer = MovieSerializer(movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
