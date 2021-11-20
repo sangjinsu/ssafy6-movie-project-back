@@ -38,7 +38,7 @@ def create_list_review(request, movie_pk):
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             movie = get_object_or_404(Movie, pk=movie_pk)
-            rank = request.data.get('rank')
+            rank = int(request.data.get('rank'))
 
             total_vote = movie.vote_average * \
                 movie.vote_count + rank
@@ -55,16 +55,15 @@ def create_list_review(request, movie_pk):
 
     elif request.method == 'DELETE':
         movie = get_object_or_404(Movie, pk=movie_pk)
-        rank = request.data.get('rank')
 
-        total_vote = movie.vote_average * movie.vote_count - rank
-        new_vote_count = movie.vote_count - 1
-        new_vote_average = round(total_vote / new_vote_count, 1)
+        # total_vote = movie.vote_average * movie.vote_count - rank
+        # new_vote_count = movie.vote_count - 1
+        # new_vote_average = round(total_vote / new_vote_count, 1)
 
-        # 영화 평균 점수 업데이트
-        movie.vote_count = new_vote_count
-        movie.vote_average = new_vote_average
-        movie.save()
+        # # 영화 평균 점수 업데이트
+        # movie.vote_count = new_vote_count
+        # movie.vote_average = new_vote_average
+        # movie.save()
 
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
