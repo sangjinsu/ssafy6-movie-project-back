@@ -38,5 +38,5 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'reviews', 'comments',
+        fields = ('pk', 'username', 'reviews', 'comments',
                   'like_movies', 'pick_movies')
