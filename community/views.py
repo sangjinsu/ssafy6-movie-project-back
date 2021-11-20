@@ -25,7 +25,7 @@ def review(request, review_pk):
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
+@api_view(['GET', 'POST'])
 def create_list_review(request, movie_pk):
     if request.method == 'GET':
         movie = get_object_or_404(Movie, pk=movie_pk)
@@ -53,20 +53,24 @@ def create_list_review(request, movie_pk):
             serializer.save(user=request.user, movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    elif request.method == 'DELETE':
-        movie = get_object_or_404(Movie, pk=movie_pk)
 
-        # total_vote = movie.vote_average * movie.vote_count - rank
-        # new_vote_count = movie.vote_count - 1
-        # new_vote_average = round(total_vote / new_vote_count, 1)
+@api_view(['DELETE'])
+def delete_review(request, review_pk, movie_pk):
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    review = get_object_or_404(Review, pk=review_pk)
+    rank = int(review.rank)
 
-        # # 영화 평균 점수 업데이트
-        # movie.vote_count = new_vote_count
-        # movie.vote_average = new_vote_average
-        # movie.save()
+    total_vote = movie.vote_average * movie.vote_count - rank
+    new_vote_count = movie.vote_count - 1
+    new_vote_average = round(total_vote / new_vote_count, 1)
 
-        review.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # 영화 평균 점수 업데이트
+    movie.vote_count = new_vote_count
+    movie.vote_average = new_vote_average
+    movie.save()
+
+    review.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET', 'POST'])
