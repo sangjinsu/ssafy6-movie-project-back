@@ -15,15 +15,40 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
 
-    class reviewSerializer(serializers.ModelSerializer):
+    class ReviewSerializer(serializers.ModelSerializer):
+
+        class MovieSerializer(serializers.ModelSerializer):
+
+            class Meta:
+                model = Movie
+                fields = ('pk', 'title')
+
+        movie = MovieSerializer(read_only=True)
+
         class Meta:
             model = Review
-            fields = ('pk', 'title',)
+            fields = ('pk', 'title', 'rank', 'movie',)
 
-    class commentSerializer(serializers.ModelSerializer):
+    class CommentSerializer(serializers.ModelSerializer):
+        class ReviewSerializer(serializers.ModelSerializer):
+
+            class MovieSerializer(serializers.ModelSerializer):
+
+                class Meta:
+                    model = Movie
+                    fields = ('pk', 'title')
+
+            movie = MovieSerializer(read_only=True)
+
+            class Meta:
+                model = Review
+                fields = ('pk', 'title', 'rank', 'movie',)
+
+        review = ReviewSerializer(read_only=True)
+
         class Meta:
             model = Comment
-            fields = ('pk', 'content',)
+            fields = ('pk', 'content', 'review',)
 
     class MovieSerializer(serializers.ModelSerializer):
 
@@ -31,8 +56,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             model = Movie
             fields = ('pk', 'title')
 
-    reviews = reviewSerializer(many=True, read_only=True)
-    comments = commentSerializer(many=True, read_only=True)
+    reviews = ReviewSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
     like_movies = MovieSerializer(many=True, read_only=True)
     pick_movies = MovieSerializer(many=True, read_only=True)
 
