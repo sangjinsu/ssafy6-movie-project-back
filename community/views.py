@@ -10,7 +10,7 @@ from movies.models import Movie
 # Create your views here.
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT'])
 def review(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     if request.method == 'GET':
@@ -24,12 +24,8 @@ def review(request, review_pk):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-    elif request.method == 'DELETE':
-        review.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 def create_list_review(request, movie_pk):
     if request.method == 'GET':
         movie = get_object_or_404(Movie, pk=movie_pk)
@@ -42,8 +38,36 @@ def create_list_review(request, movie_pk):
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             movie = get_object_or_404(Movie, pk=movie_pk)
+            rank = request.data.get('rank')
+
+            total_vote = movie.vote_average * \
+                movie.vote_count + rank
+            new_vote_count = movie.vote_count + 1
+            new_vote_average = round(total_vote / new_vote_count, 1)
+
+            # 영화 평균 점수 업데이트
+            movie.vote_count = new_vote_count
+            movie.vote_average = new_vote_average
+            movie.save()
+
             serializer.save(user=request.user, movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    elif request.method == 'DELETE':
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        rank = request.data.get('rank')
+
+        total_vote = movie.vote_average * movie.vote_count - rank
+        new_vote_count = movie.vote_count - 1
+        new_vote_average = round(total_vote / new_vote_count, 1)
+
+        # 영화 평균 점수 업데이트
+        movie.vote_count = new_vote_count
+        movie.vote_average = new_vote_average
+        movie.save()
+
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET', 'POST'])
@@ -52,7 +76,7 @@ def create_list_comment(request, review_pk):
         # 리스트
         review = get_object_or_404(Review, pk=review_pk)
         comments = review.comments.order_by('-created_at')
-        serializer = CommentListSerializer(review.comments, many=True)
+        serializer = CommentListSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'POST':
         # 댓글 생성
