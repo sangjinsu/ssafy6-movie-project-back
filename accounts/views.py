@@ -54,7 +54,7 @@ def delete(request):
 
 
 @api_view(['GET'])
-def profile(request, username):
-    user = get_object_or_404(get_user_model(), username=username)
+def profile(request):
+    user = get_object_or_404(get_user_model(), username=request.user.username)
     serializer = UserDetailSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
