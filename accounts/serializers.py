@@ -13,6 +13,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'password',)
 
 
+class UserPKSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('pk', 'username')
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
 
     class ReviewSerializer(serializers.ModelSerializer):

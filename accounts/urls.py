@@ -11,5 +11,7 @@ urlpatterns = [
     path("delete/", views.delete),
 
     path('api-token-auth/', obtain_jwt_token),
+
+    path("user/", views.user_pk),
     path("profile/", views.profile),
 ]
