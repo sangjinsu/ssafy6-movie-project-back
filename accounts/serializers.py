@@ -28,7 +28,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
             class Meta:
                 model = Movie
-                fields = ('pk', 'title')
+                fields = ('pk', 'title',)
 
         movie = MovieSerializer(read_only=True)
 
@@ -61,7 +61,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Movie
-            fields = ('pk', 'title')
+            fields = ('pk', 'title', 'poster_path')
 
     reviews = ReviewSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
