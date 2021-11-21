@@ -80,20 +80,5 @@ def detail(request, movie_pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-def youtube(request):
-    movie_title = request.data.get('title')
-    API_URL = 'https://www.googleapis.com/youtube/v3/search'
-    YOUTUBE_API_KEY = 'AIzaSyC5RMAkEJWF1MHT9s39WiPH6mEUfBF-U1A'
-    payload = {
-        'key': YOUTUBE_API_KEY,
-        'part': 'snippet',
-        'q': movie_title + ' 예고편',
-        'type': 'video',
-    }
-    result = requests.get(url=API_URL, params=payload).json()
-    return Response(result, status=status.HTTP_200_OK)
-
-
 def recommend(request):
     pass
