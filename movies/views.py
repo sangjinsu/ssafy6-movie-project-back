@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -6,7 +7,6 @@ from rest_framework.response import Response
 from movies.serializers import MovieDetailSerializer, MovieSerializer
 
 from .models import Genre, Movie
-
 
 # Create your views here.
 
@@ -141,4 +141,24 @@ def recommend_by_reviews(request):
 
 @api_view(['GET'])
 def recommend_by_users(request):
-    pass
+    me = request.user
+    me_like_movies = me.like_movies.all()
+    users = get_user_model().objects.all()
+
+    similar_users = sorted(users, key=lambda user: len(
+        set(user.like_movies.all()).intersection(me_like_movies)))
+
+    def make_recommend_movies():
+        recommend_movies = []
+        for similar_user in similar_users:
+            for like_movie in similar_user.like_movies.all():
+                if like_movie not in me_like_movies:
+                    recommend_movies.append(like_movie)
+                    if len(recommend_movies) >= 15:
+                        return recommend_movies
+        return recommend_movies
+
+    recommend_movies = make_recommend_movies()
+
+    serializer = MovieSerializer(recommend_movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
