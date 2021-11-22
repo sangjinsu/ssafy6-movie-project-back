@@ -133,7 +133,7 @@ def recommend_by_reviews(request):
 
     movies = Movie.objects.order_by('-popularity', '-release_date')[:100]
     movies = sorted(movies,
-                    key=sorting_algorithm)[:15]
+                    key=sorting_algorithm)[:30]
 
     serializer = MovieSerializer(movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -154,7 +154,7 @@ def recommend_by_users(request):
             for like_movie in similar_user.like_movies.all():
                 if like_movie not in me_like_movies:
                     recommend_movies.append(like_movie)
-                    if len(recommend_movies) >= 15:
+                    if len(recommend_movies) >= 30:
                         return recommend_movies
         return recommend_movies
 
