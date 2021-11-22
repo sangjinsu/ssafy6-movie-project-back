@@ -9,13 +9,6 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MovieNameSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Movie
-        fields = ('pk', 'title',)
-
-
 class MovieDetailSerializer(serializers.ModelSerializer):
     class GenreSerializer(serializers.ModelSerializer):
         class Meta:
