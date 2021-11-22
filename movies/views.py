@@ -7,7 +7,6 @@ from movies.serializers import MovieDetailSerializer, MovieSerializer
 
 from .models import Genre, Movie
 
-import requests
 
 # Create your views here.
 
@@ -80,5 +79,66 @@ def detail(request, movie_pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def recommend(request):
+@api_view(['GET'])
+def recommend_by_reviews(request):
+    user = request.user
+    reviews = user.reviews.all()
+    likes = user.like_movies.all()
+    genres = {
+        '액션': {'score': 0, 'count': 0},
+        "모험": {'score': 0, 'count': 0},
+        "애니메이션": {'score': 0, 'count': 0},
+        "코미디": {'score': 0, 'count': 0},
+        "범죄": {'score': 0, 'count': 0},
+        "다큐멘터리": {'score': 0, 'count': 0},
+        "드라마": {'score': 0, 'count': 0},
+        "가족": {'score': 0, 'count': 0},
+        "판타지": {'score': 0, 'count': 0},
+        "역사": {'score': 0, 'count': 0},
+        "공포": {'score': 0, 'count': 0},
+        "음악": {'score': 0, 'count': 0},
+        "미스터리": {'score': 0, 'count': 0},
+        "로맨스": {'score': 0, 'count': 0},
+        "SF": {'score': 0, 'count': 0},
+        "TV 영화": {'score': 0, 'count': 0},
+        "스릴러": {'score': 0, 'count': 0},
+        "전쟁": {'score': 0, 'count': 0},
+        "서부": {'score': 0, 'count': 0},
+    }
+    review_movies = []
+    for review in reviews:
+        review_movies.append(review.movie.title)
+        for genre in review.movie.genres.all():
+            genres[genre.name]['score'] += review.rank
+            genres[genre.name]['count'] += 1
+
+    for like in likes:
+        if like.title not in review_movies:
+            for genre in like.genres.all():
+                genres[genre.name]['score'] += 10
+                genres[genre.name]['count'] += 1
+
+    for genre, data in genres.items():
+        if data['count'] > 0:
+            data['avg'] = data['score'] / data['count']
+        else:
+            data['avg'] = 0
+
+    def sorting_algorithm(movie):
+        movie_score = 0
+        movie_genres = movie.genres.all()
+        for movie_genre in movie_genres:
+            movie_score += genres[movie_genre.name]['avg']
+        return (-movie_score, -movie.vote_average, -movie.vote_count)
+
+    movies = Movie.objects.order_by('-popularity', '-release_date')[:100]
+    movies = sorted(movies,
+                    key=sorting_algorithm)[:15]
+
+    serializer = MovieSerializer(movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def recommend_by_users(request):
     pass

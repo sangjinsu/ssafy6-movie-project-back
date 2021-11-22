@@ -20,6 +20,9 @@ urlpatterns = [
     # 단일 영화 상세 정보 조회
     path("<int:movie_pk>/", views.detail),
 
-    # 사용자 영화 추천
-    path("recommend/", views.recommend)
+    # 리뷰 좋아요 기반 영화 추천
+    path("recommend/reviews", views.recommend_by_reviews),
+
+    # 사용자 기반 영화 추천
+    path("recommend/users", views.recommend_by_users)
 ]
