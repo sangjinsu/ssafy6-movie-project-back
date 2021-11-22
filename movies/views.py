@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from movies.serializers import MovieDetailSerializer, MovieSerializer
+from movies.serializers import MovieDetailSerializer, MovieNameSerializer, MovieSerializer
 
 from .models import Genre, Movie
 
@@ -131,11 +131,22 @@ def recommend_by_reviews(request):
             movie_score += genres[movie_genre.name]['avg']
         return (-movie_score, -movie.vote_average, -movie.vote_count)
 
-    movies = Movie.objects.order_by('-popularity', '-release_date')[:100]
+    movies = Movie.objects.order_by('-popularity', '-release_date')[:500]
     movies = sorted(movies,
-                    key=sorting_algorithm)[:30]
+                    key=sorting_algorithm)
 
-    serializer = MovieSerializer(movies, many=True)
+    def make_recommend_movies():
+        recommend_movies = []
+        for movie in movies:
+            if movie not in likes and movie not in reviews:
+                recommend_movies.append(movie)
+                if len(recommend_movies) >= 30:
+                    return recommend_movies
+        return recommend_movies
+
+    recommend_movies = make_recommend_movies()
+
+    serializer = MovieSerializer(recommend_movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -161,4 +172,11 @@ def recommend_by_users(request):
     recommend_movies = make_recommend_movies()
 
     serializer = MovieSerializer(recommend_movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def movie_names(request):
+    movies = Movie.objects.all()
+    serializer = MovieNameSerializer(movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
