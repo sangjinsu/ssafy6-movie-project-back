@@ -119,20 +119,23 @@ def recommend_by_reviews(request):
     for like in likes:
         if like.title not in review_movies:
             for genre in like.genres.all():
-                genres[genre.name]['score'] += 10
+                genres[genre.name]['score'] += 7
                 genres[genre.name]['count'] += 1
 
     for genre, data in genres.items():
         if data['count'] > 0:
-            data['avg'] = data['score'] / data['count']
+            data['avg'] = round(data['score'] / data['count'])
         else:
             data['avg'] = 0
+
+    print(genres)
 
     def sorting_algorithm(movie):
         movie_score = 0
         movie_genres = movie.genres.all()
         for movie_genre in movie_genres:
             movie_score += genres[movie_genre.name]['avg']
+        movie_score = round(movie_score / len(movie_genres))
         return (-movie_score, -movie.vote_average, -movie.vote_count)
 
     movies = Movie.objects.order_by('-popularity', '-release_date')[:500]
@@ -149,7 +152,6 @@ def recommend_by_reviews(request):
         return recommend_movies
 
     recommend_movies = make_recommend_movies()
-
     serializer = MovieSerializer(recommend_movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
