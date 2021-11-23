@@ -164,14 +164,14 @@ def recommend_by_users(request):
         set(user.like_movies.all()).intersection(me_like_movies)))
 
     def make_recommend_movies():
-        recommend_movies = []
+        recommend_movies = set()
         for similar_user in similar_users:
             for like_movie in similar_user.like_movies.all():
                 if like_movie not in me_like_movies:
-                    recommend_movies.append(like_movie)
+                    recommend_movies.add(like_movie)
                     if len(recommend_movies) >= 30:
                         return recommend_movies
-        return recommend_movies
+        return list(recommend_movies)
 
     recommend_movies = make_recommend_movies()
 

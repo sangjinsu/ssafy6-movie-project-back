@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework.fields import SerializerMethodField
 
 from community.models import Comment, Review
 from movies.models import Movie
@@ -34,7 +35,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Review
-            fields = ('pk', 'title', 'rank', 'movie', 'content',)
+            fields = ('pk', 'title', 'rank', 'movie',
+                      'content', 'updated_at',)
 
     class CommentSerializer(serializers.ModelSerializer):
         class ReviewSerializer(serializers.ModelSerializer):
@@ -55,13 +57,15 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Comment
-            fields = ('pk', 'content', 'review',)
+            fields = ('pk', 'content', 'review', 'updated_at')
 
     class MovieSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Movie
             fields = ('id', 'title', 'poster_path')
+
+        SerializerMethodField
 
     reviews = ReviewSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
