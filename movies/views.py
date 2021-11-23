@@ -84,6 +84,10 @@ def recommend_by_reviews(request):
     user = request.user
     reviews = user.reviews.all()
     likes = user.like_movies.all()
+
+    if not reviews and not likes:
+        return Response([], status=status.HTTP_200_OK)
+
     genres = {
         '액션': {'score': 0, 'count': 0},
         "모험": {'score': 0, 'count': 0},
