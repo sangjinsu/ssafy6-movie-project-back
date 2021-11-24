@@ -28,4 +28,7 @@ urlpatterns = [
 
     # MD 영화 추천
     path("recommend/md", views.recommend_by_md),
+
+    # 영화 제목 검색
+    path("name/", views.movies_name),
 ]

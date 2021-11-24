@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Q
 
-from movies.serializers import MovieDetailSerializer, MovieSerializer
+from movies.serializers import MovieDetailSerializer, MovieNameSerializer, MovieSerializer
 
 from .models import Genre, Movie
 
@@ -222,3 +222,10 @@ def recommend_by_md(request):
         'sang': sang_serializer.data,
     }
     return Response(res, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def movies_name(request):
+    movies = Movie.objects.all()
+    serializer = MovieNameSerializer(movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
