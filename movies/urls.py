@@ -25,4 +25,7 @@ urlpatterns = [
 
     # 사용자 기반 영화 추천
     path("recommend/users", views.recommend_by_users),
+
+    # MD 영화 추천
+    path("recommend/md", views.recommend_by_md),
 ]

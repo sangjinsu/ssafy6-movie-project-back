@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.db.models import Q
 
 from movies.serializers import MovieDetailSerializer, MovieSerializer
 
@@ -128,8 +129,6 @@ def recommend_by_reviews(request):
         else:
             data['avg'] = 0
 
-    print(genres)
-
     def sorting_algorithm(movie):
         movie_score = 0
         movie_genres = movie.genres.all()
@@ -179,3 +178,47 @@ def recommend_by_users(request):
 
     serializer = MovieSerializer(recommend_movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def recommend_by_md(request):
+    yun_picks = [
+        "블랙 위도우", "프리 가이", "코코",
+        "스파이더맨: 뉴 유니버스", "데드풀",
+        "소울", "주토피아",  "라라랜드",
+        "인사이드 아웃", "이터널 선샤인",
+        "히든 피겨스", "나이브스 아웃", "굿모닝 에브리원",
+        "인턴", "악마는 프라다를 입는다"
+    ]
+    sang_picks = [
+        '포레스트 검프', "해리 포터와 죽음의 성물 2", "어바웃 타임",
+        "나의 소녀시대", "러브 액츄얼리", "미드나이트 스카이",
+        "1917", "라스트 홀리데이", "이프 온리", "에놀라 홈즈",
+        "캐롤", "찰리와 초콜릿 공장", "크리스마스 스위치 - 한 번 더 바꿔?",
+        "스파이더맨: 파 프롬 홈", "두 교황", "인셉션"
+    ]
+
+    yun_pick_movies = Movie.objects.filter(
+        Q(title=yun_picks[0]) | Q(title=yun_picks[1]) | Q(title=yun_picks[2]) | Q(title=yun_picks[3]) |
+        Q(title=yun_picks[4]) | Q(title=yun_picks[5]) | Q(title=yun_picks[6]) | Q(title=yun_picks[7]) |
+        Q(title=yun_picks[8]) | Q(title=yun_picks[9]) | Q(title=yun_picks[10]) | Q(title=yun_picks[11]) |
+        Q(title=yun_picks[12]) | Q(title=yun_picks[13]) |
+        Q(title=yun_picks[14])
+    )
+
+    sang_pick_movies = Movie.objects.filter(
+        Q(title=sang_picks[0]) | Q(title=sang_picks[1]) | Q(title=sang_picks[2]) | Q(title=sang_picks[3]) |
+        Q(title=sang_picks[4]) | Q(title=sang_picks[5]) | Q(title=sang_picks[6]) | Q(title=sang_picks[7]) |
+        Q(title=sang_picks[8]) | Q(title=sang_picks[9]) | Q(title=sang_picks[10]) | Q(title=sang_picks[11]) |
+        Q(title=sang_picks[12]) | Q(title=sang_picks[13]) |
+        Q(title=sang_picks[14])
+    )
+
+    yun_serializer = MovieSerializer(yun_pick_movies, many=True)
+    sang_serializer = MovieSerializer(sang_pick_movies, many=True)
+
+    res = {
+        'yun': yun_serializer.data,
+        'sang': sang_serializer.data,
+    }
+    return Response(res, status=status.HTTP_200_OK)
