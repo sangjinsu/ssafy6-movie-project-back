@@ -125,7 +125,7 @@ def recommend_by_reviews(request):
 
     for genre, data in genres.items():
         if data['count'] > 0:
-            data['avg'] = round(data['score'] / data['count'])
+            data['avg'] = round(data['score'] / data['count'], 1)
         else:
             data['avg'] = 0
 
@@ -134,7 +134,7 @@ def recommend_by_reviews(request):
         movie_genres = movie.genres.all()
         for movie_genre in movie_genres:
             movie_score += genres[movie_genre.name]['avg']
-        movie_score = round(movie_score / len(movie_genres))
+        movie_score = round(movie_score / len(movie_genres), 1)
         return (-movie_score, -movie.vote_average, -movie.vote_count)
 
     movies = Movie.objects.order_by('-popularity', '-release_date')[:500]
