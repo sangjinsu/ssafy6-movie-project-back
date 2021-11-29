@@ -3,4 +3,4 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    pass
+    kakao_id = models.PositiveIntegerField(blank=True)

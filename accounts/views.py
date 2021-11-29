@@ -1,13 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from requests.api import get
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.fields import EmailField
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.serializers import Serializer
+import jwt
+import requests
+import os
+from datetime import datetime, timedelta
 
 from accounts.common.validator import password_validator, username_validator
+from accounts.models import User
 
 
 from .serializers import UserDetailSerializer, UserPKSerializer, UserSerializer
@@ -66,3 +70,70 @@ def profile(request):
         get_user_model(), username=request.user.username)
     serializer = UserDetailSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def kakao_login(request):
+    code = request.data.get('code')
+
+    url = 'https://kauth.kakao.com/oauth/token'
+    body = {
+        'grant_type': 'authorization_code',
+        'client_id': os.environ.get("CLIENT_ID"),
+        'redicrect_url': os.environ.get("REDIRECT_URL"),
+        'code': code
+    }
+
+    kakao_response = requests.post(url, data=body).json()
+
+    access_token = kakao_response.get('access_token')
+
+    url = 'https://kapi.kakao.com/v2/user/me'
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+    }
+
+    kakao_response = requests.get(url, headers=headers).json()
+
+    kakao_id = kakao_response.get('id')
+
+    if User.objects.filter(kakao_id=kakao_id).exists():
+        user = get_object_or_404(
+            get_user_model(), kakao_id=kakao_id)
+
+        token = jwt.encode(
+            {
+                'user_id': user.pk,
+                'username': user.username,
+                'exp': datetime.now() + timedelta(days=1),
+                'email': user.email
+            },
+            os.environ.get("SECRET_KEY"),
+            algorithm='HS256'
+        )
+
+        return Response(token, status=status.HTTP_200_OK)
+
+    kakao_nickname = kakao_response.get(
+        'kakao_account').get('profile').get('nickname')
+
+    User(
+        kakao_id=kakao_id,
+        username=kakao_nickname).save()
+
+    user = get_object_or_404(
+        get_user_model(), kakao_id=kakao_id)
+
+    token = jwt.encode(
+        {
+            'user_id': user.pk,
+            'username': user.username,
+            'exp': datetime.now() + timedelta(days=1),
+            'email': user.email
+        },
+        os.environ.get("SECRET_KEY"),
+        algorithm='HS256'
+    )
+
+    return Response({'token': token}, status=status.HTTP_200_OK)
