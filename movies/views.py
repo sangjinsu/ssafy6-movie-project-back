@@ -159,10 +159,10 @@ def recommend_by_reviews(request):
 def recommend_by_users(request):
     me = request.user
     me_like_movies = me.like_movies.all()
-    
+
     if len(me_like_movies) == 0:
         return Response([], status=status.HTTP_200_OK)
-    
+
     users = get_user_model().objects.all()
 
     similar_users = sorted(users, key=lambda user: len(
