@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-&ea6)ay7vn9rng@f&h+q+x!d$-om5uz7(2$oug$_3j=yej*z5f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '3.35.10.120',
+    'kinopio.world',
+]
 
 
 # Application definition
@@ -61,15 +64,13 @@ MIDDLEWARE = [
 ]
 
 # 1. 특정 Origin만 선택적으로 허용
-# CORS_ALLOWED_ORIGINS = [
-#     "https://example.com",
-#     "https://sub.example.com",
-#     "http://localhost:8080",
-#     "http://127.0.0.1:9000"
-# ]
+CORS_ALLOWED_ORIGINS = [
+     "http://kinopio.pub",
+     "https://kinopio.pub",
+]
 
 # 2. 모든 Origin 허용
-CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOW_ALL_ORIGINS = True
 
 
 ROOT_URLCONF = 'server.urls'
@@ -141,6 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
