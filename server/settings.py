@@ -26,9 +26,12 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '3.35.10.120',
+    'kinopio.world',
+]
 
 
 # Application definition
@@ -63,13 +66,12 @@ MIDDLEWARE = [
 ]
 
 # 1. 특정 Origin만 선택적으로 허용
-# CORS_ALLOWED_ORIGINS = [
-#     "http://kinopio.pub",
-#     "https://kinopio.pub",
-# ]
-
+CORS_ALLOWED_ORIGINS = [
+     "http://kinopio.pub",
+     "https://kinopio.pub",
+]
 # 2. 모든 Origin 허용
-CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOW_ALL_ORIGINS = True
 
 
 ROOT_URLCONF = 'server.urls'
